@@ -2,6 +2,7 @@ name: tests
 
 on:
     push:
+    pull_request:
     schedule:
         - cron: '0 0 * * *'
 
@@ -24,7 +25,8 @@ jobs:
             fail-fast: true
             matrix:
                 php: [7.3, 7.4, 8.0, 8.1]
-                stability: [prefer-stable]
+                stability:
+                  - prefer-stable
 
         name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
 

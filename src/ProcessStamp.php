@@ -1,13 +1,13 @@
 <?php
 
-namespace OrisIntel\ProcessStamps;
+namespace AlwaysOpen\ProcessStamps;
 
 use Exception;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 
 class ProcessStamp extends Model
 {
@@ -44,7 +44,7 @@ class ProcessStamp extends Model
      *
      * @return ProcessStamp
      *
-     * @throws Exception
+     * @throws ModelNotFoundException|Exception
      */
     public static function firstOrCreateByProcess(array $process, ?string $hash = null) : self
     {
@@ -56,38 +56,39 @@ class ProcessStamp extends Model
             $hash = static::makeProcessHash($process);
         }
 
-        return retry(
-            2,
-            function () use ($hash, $process) {
-                $lock = Cache::lock('process-stamps-hash-create-' . $hash, 10);
-                $lock->block(5);
+        return retry(4, function() use ($hash, $process) {
+            $parent = null;
 
-                $parent = null;
+            if (config('process-stamps.resolve_recursive') && ! empty($process['parent_name'])) {
+                $parent = static::firstOrCreateByProcess(static::getProcessName($process['type'], $process['parent_name']));
+            }
 
-                if (config('process-stamps.resolve_recursive') && ! empty($process['parent_name'])) {
-                    $parent = static::firstOrCreateByProcess(static::getProcessName($process['type'], $process['parent_name']));
-                }
+            $lock = Cache::lock('process-stamps-hash-create-' . $hash, 12);
+            $lock->block(3);
 
-                $stamp = static::where('hash', $hash)->first();
+            $stamp = static::firstWhere('hash', $hash);
 
-                if (! $stamp) {
-                    /*
-                     * If stamp does not exist in the database yet, go ahead and obtain a lock to create it.
-                     * This specifically doesn't lock as the first step to avoid all calls obtaining a lock from the
-                     * cache if the item already exists in the DB.
-                     */
-                    $stamp = static::firstOrCreate(['hash' => $hash], [
-                        'name'      => trim($process['name']),
-                        'type'      => $process['type'],
-                        'parent_id' => optional($parent)->getKey(),
-                    ]);
-                }
+            if (! $stamp) {
+                /*
+                 * If stamp does not exist in the database yet, go ahead and obtain a lock to create it.
+                 * This specifically doesn't lock as the first step to avoid all calls obtaining a lock from the cache
+                 * if the item already exists in the DB.
+                 */
+                $stamp = static::firstOrCreate(['hash' => $hash], [
+                    'name'      => trim($process['name']),
+                    'type'      => $process['type'],
+                    'parent_id' => optional($parent)->getKey(),
+                ]);
+            }
 
-                $lock->release();
+            $lock->release();
 
-                return $stamp;
-            },
-        );
+            if (null === $stamp) {
+                throw new ModelNotFoundException();
+            }
+
+            return $stamp;
+        }, 25);
     }
 
     /**
