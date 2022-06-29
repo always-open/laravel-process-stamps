@@ -4,8 +4,8 @@ services:
     build:
       context: ./
       dockerfile: ./docker/Dockerfile
-    image: processstamps
-    container_name: processstamps-app
+    image: processes-stamp
+    container_name: processes-stamp-app
     restart: unless-stopped
     working_dir: /var/www/
     volumes:
