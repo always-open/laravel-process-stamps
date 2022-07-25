@@ -171,12 +171,11 @@ class ProcessStamp extends Model
                     foreach (debug_backtrace() as $step) {
                         if (str_ends_with($step['class'], 'CallQueuedHandler')) {
                             foreach ($step['args'] as $arg) {
-                                if (is_object($arg) && property_exists($arg, 'commandName')) {
-                                    $command_name_parts = explode('\\', $arg->commandName);
-                                    $name = array_pop($command_name_parts);
-                                    break 2;
-                                } elseif (is_array($arg) && array_key_exists('commandName', $arg)) {
-                                    $command_name_parts = explode('\\', $arg['commandName']);
+                                if (
+                                    (is_object($arg) && $command_name = $arg->commandName ?? null )
+                                    || (is_array($arg) && $command_name = $arg['commandName'] ?? null )
+                                ) {
+                                    $command_name_parts = explode('\\', $command_name);
                                     $name = array_pop($command_name_parts);
                                     break 2;
                                 }
