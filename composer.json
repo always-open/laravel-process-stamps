@@ -2,6 +2,7 @@
     "name": "always-open/laravel-process-stamps",
     "description": "Logs which process created or modified a record",
     "keywords": [
+        "always open",
         "always-open",
         "laravel-process-stamps",
         "laravel",
@@ -9,6 +10,26 @@
     ],
     "homepage": "https://github.com/always-open/laravel-process-stamps",
     "license": "MIT",
+    "authors": [
+        {
+            "name": "Tom Schlick",
+            "role": "Developer"
+        },
+        {
+            "name": "Quentin Schmick",
+            "email": "qschmick@gmail.com",
+            "role": "Developer"
+        },
+        {
+            "name": "Lucas Graciano",
+            "role": "Developer"
+        },
+        {
+            "name": "Always Open",
+            "homepage": "https://github.com/always-open",
+            "role": "Organization"
+        }
+    ],
     "require": {
         "php": "^7.3|^8.0",
         "laravel/framework": "^8.0|^9.0|^10.0"
