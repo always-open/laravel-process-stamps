@@ -5,10 +5,10 @@ on:
     pull_request:
     pull_request_target:
         branches:
-            - main
-            - master
-            - 7.x
-            - 6.x
+            - 'main'
+            - 'master'
+            - '7.x'
+            - '6.x'
     schedule:
         - cron: '0 0 * * *'
 
