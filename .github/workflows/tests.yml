@@ -5,8 +5,8 @@ on:
     pull_request:
     pull_request_target:
         branches:
-            - 'main'
-            - 'master'
+            - main
+            - master
             - '7.x'
             - '6.x'
     schedule:
