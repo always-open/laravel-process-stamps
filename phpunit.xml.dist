@@ -16,7 +16,7 @@
     </testsuites>
     <filter>
         <whitelist>
-            <directory suffix=".php">src/</directory>
+            <directory suffix="Test.php">src/</directory>
         </whitelist>
     </filter>
     <php>
@@ -24,5 +24,6 @@
         <env name="DB_CONNECTION" value="sqlite" />
         <env name="DB_DATABASE" value=":memory:" />
         <env name="DB_FOREIGN_KEYS" value="true" />
+        <env name="foreign_key_constraints" value="true" />
     </php>
 </phpunit>

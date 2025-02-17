@@ -35,6 +35,11 @@ class AddParentIdToTable extends Migration
     public function down()
     {
         Schema::table(config('process-stamps.table'), function (Blueprint $table) {
+            $table->dropForeign(['parent_id']);
+            $table->dropIndex(['parent_id']);
+        });
+
+        Schema::table(config('process-stamps.table'), function (Blueprint $table) {
             $table->dropColumn('parent_id');
         });
     }
