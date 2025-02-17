@@ -3,6 +3,12 @@ name: tests
 on:
     push:
     pull_request:
+    pull_request_target:
+        branches:
+            - main
+            - master
+            - '7.x'
+            - '6.x'
     schedule:
         - cron: '0 0 * * *'
 
@@ -24,8 +30,8 @@ jobs:
         strategy:
             fail-fast: true
             matrix:
-                php: [7.3, 7.4, 8.0, 8.1]
-                stability: 
+                php: [8.2, 8.3, 8.4]
+                stability:
                   - prefer-stable
 
         name: PHP ${{ matrix.php }} - ${{ matrix.stability }}
