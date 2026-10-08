@@ -5,6 +5,7 @@ namespace AlwaysOpen\ProcessStamps\Tests;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use AlwaysOpen\ProcessStamps\ProcessStamp;
 use AlwaysOpen\ProcessStamps\Tests\Fakes\Post;
+use PHPUnit\Framework\Attributes\Test;
 
 class ParentTest extends TestCase
 {
@@ -15,7 +16,7 @@ class ParentTest extends TestCase
         return Post::create(['name' => 'Test 123']);
     }
 
-    /** @test */
+    #[Test]
     public function url_simple()
     {
         $process = ProcessStamp::getProcessName('url', '/test/hello');
@@ -24,7 +25,7 @@ class ParentTest extends TestCase
         $this->assertEquals('/test', $process['parent_name']);
     }
 
-    /** @test */
+    #[Test]
     public function url_simple_with_extension()
     {
         $process = ProcessStamp::getProcessName('url', '/test/hello.php');
@@ -33,7 +34,7 @@ class ParentTest extends TestCase
         $this->assertEquals('/test', $process['parent_name']);
     }
 
-    /** @test */
+    #[Test]
     public function url_simple_with_query_string()
     {
         $process = ProcessStamp::getProcessName('url', '/test/hello?test=1234&another=true');
@@ -42,7 +43,7 @@ class ParentTest extends TestCase
         $this->assertEquals('/test/hello', $process['parent_name']);
     }
 
-    /** @test */
+    #[Test]
     public function saved_model_includes_parent()
     {
         $this->assertCount(0, ProcessStamp::all());
@@ -58,7 +59,7 @@ class ParentTest extends TestCase
         $this->assertCount(3, ProcessStamp::all());
     }
 
-    /** @test */
+    #[Test]
     public function saved_model_with_resolve_recursive_disabled_does_not_generate_parent()
     {
         config()->set('process-stamps.resolve_recursive', false);
@@ -74,7 +75,7 @@ class ParentTest extends TestCase
         $this->assertCount(1, ProcessStamp::all());
     }
 
-    /** @test */
+    #[Test]
     public function artisan_simple()
     {
         $process = ProcessStamp::getProcessName('artisan', 'test:sync');
@@ -82,7 +83,7 @@ class ParentTest extends TestCase
         $this->assertEquals('test:sync', $process['name']);
     }
 
-    /** @test */
+    #[Test]
     public function artisan_with_flags()
     {
         $process = ProcessStamp::getProcessName('artisan', 'test:sync --help');
@@ -91,7 +92,7 @@ class ParentTest extends TestCase
         $this->assertEquals('test:sync', $process['parent_name']);
     }
 
-    /** @test */
+    #[Test]
     public function artisan_with_options()
     {
         $process = ProcessStamp::getProcessName('artisan', 'test:sync --url_id=12345 --limit=4');
@@ -100,7 +101,7 @@ class ParentTest extends TestCase
         $this->assertEquals('test:sync', $process['parent_name']);
     }
 
-    /** @test */
+    #[Test]
     public function make_sure_artisan_does_not_duplicate()
     {
         $process = ProcessStamp::getProcessName('artisan', 'violation:audit --no-rollbar');

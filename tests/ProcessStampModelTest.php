@@ -4,12 +4,13 @@ namespace AlwaysOpen\ProcessStamps\Tests;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use AlwaysOpen\ProcessStamps\ProcessStamp;
+use PHPUnit\Framework\Attributes\Test;
 
 class ProcessStampModelTest extends TestCase
 {
     use DatabaseTransactions;
 
-    /** @test */
+    #[Test]
     public function proccess_hash_can_be_generated()
     {
         $hash = 'cd371296c96ff34b7eb993229d0bede9da2702d6';
@@ -21,7 +22,7 @@ class ProcessStampModelTest extends TestCase
         $this->assertEquals($hash, ProcessStamp::makeProcessHash($process));
     }
 
-    /** @test */
+    #[Test]
     public function process_id_entry_can_be_saved()
     {
         $process = [
@@ -39,7 +40,7 @@ class ProcessStampModelTest extends TestCase
         $this->assertTrue($stamp->children->isEmpty());
     }
 
-    /** @test */
+    #[Test]
     public function existing_process_id_entry_can_be_retrieved()
     {
         $process = [
@@ -57,7 +58,7 @@ class ProcessStampModelTest extends TestCase
         $this->assertEquals($first->getKey(), $second->getKey());
     }
 
-    /** @test */
+    #[Test]
     public function different_hash_by_type()
     {
         $types = [
