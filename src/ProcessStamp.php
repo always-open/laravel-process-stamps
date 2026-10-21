@@ -181,6 +181,13 @@ class ProcessStamp extends Model
     }
 
     /**
+     * The id of the current process's stamp, created on first use.
+     *
+     * With `process-stamps.cache.enabled`, the id is kept in the configured cache store, so only
+     * the first stamp of each process reads the table. The id is cached once the transaction that
+     * may have created the row commits: a row created inside a transaction that rolls back would
+     * otherwise leave a cached id pointing at nothing.
+     *
      * @return int
      */
     public static function getCurrentProcessId() : int
@@ -188,14 +195,22 @@ class ProcessStamp extends Model
         $process = static::getProcessName();
         $hash = self::makeProcessHash($process);
 
-        if (config('process-stamp.cache.enabled')) {
-            return Cache::store(config('process-stamp.cache.store'))
-                ->forever($hash, function () use ($process, $hash) {
-                    return self::firstOrCreateByProcess($process, $hash)->getKey();
-                });
+        if (! config('process-stamps.cache.enabled')) {
+            return self::firstOrCreateByProcess($process, $hash)->getKey();
         }
 
-        return self::firstOrCreateByProcess($process, $hash)->getKey();
+        $cache = Cache::store(config('process-stamps.cache.store'));
+        $key = 'process-stamps:' . $hash;
+
+        $cached = $cache->get($key);
+        if ($cached !== null) {
+            return (int) $cached;
+        }
+
+        $stamp = self::firstOrCreateByProcess($process, $hash);
+        $stamp->getConnection()->afterCommit(fn () => $cache->forever($key, $stamp->getKey()));
+
+        return $stamp->getKey();
     }
 
     /**
