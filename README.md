@@ -23,6 +23,17 @@ php artisan vendor:publish --provider="\AlwaysOpen\ProcessStamps\ProcessStampsSe
 
 Running the above command will publish both the migration and the config file.
 
+### Caching the current process's stamp
+
+Every stamped save needs the current process's stamp id. With `process-stamps.cache.enabled`
+(`PROCESS_STAMP_CACHE_ENABLED`, on by default), the id is kept in a cache store, so only the first
+stamp of each process reads the `process_stamps` table. `process-stamps.cache.store`
+(`PROCESS_STAMP_CACHE_DRIVER`) picks the store; unset, it is the application's default store.
+
+The id is cached once the transaction that may have created the row commits, so a stamp created
+inside a transaction that rolls back is never cached. In tests that wrap each test in a
+transaction, use a store that does not outlive the test, such as `array`.
+
 ## Usage
 
 After adding the proper fields to your table, add the trait to your model.
